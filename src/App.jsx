@@ -39,6 +39,7 @@ function TerminalLine({ item }) {
                 key={index}
                 className="terminal-link"
                 href={child.link}
+                onClick={(event) => event.stopPropagation()}
                 target={external ? '_blank' : undefined}
                 rel={external ? 'noopener noreferrer' : undefined}
               >
@@ -79,9 +80,32 @@ export default function App() {
   const bodyRef = useRef(null);
   const commandHistoryRef = useRef([]);
 
+  const isCoarsePointer = useCallback(
+    () => window.matchMedia?.('(pointer: coarse)').matches ?? false,
+    [],
+  );
+
   useEffect(() => {
     commandHistoryRef.current = commandHistory;
   }, [commandHistory]);
+
+  useEffect(() => {
+    const updateViewportHeight = () => {
+      const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+      document.documentElement.style.setProperty('--app-height', `${viewportHeight}px`);
+    };
+
+    const visualViewport = window.visualViewport;
+
+    updateViewportHeight();
+    window.addEventListener('resize', updateViewportHeight);
+    visualViewport?.addEventListener('resize', updateViewportHeight);
+
+    return () => {
+      window.removeEventListener('resize', updateViewportHeight);
+      visualViewport?.removeEventListener('resize', updateViewportHeight);
+    };
+  }, []);
 
   const scrollToBottom = useCallback(() => {
     if (!bodyRef.current) {
@@ -98,12 +122,12 @@ export default function App() {
   }, [history, scrollToBottom]);
 
   useEffect(() => {
-    if (!booted || animating) {
+    if (!booted || isCoarsePointer()) {
       return;
     }
 
     inputRef.current?.focus();
-  }, [booted, animating]);
+  }, [booted, isCoarsePointer]);
 
   const animateLines = useCallback(
     (lines) => {
@@ -226,10 +250,10 @@ export default function App() {
   }, [autoTypeCommand]);
 
   const focusInput = useCallback(() => {
-    if (!animating) {
+    if (!animating && !isCoarsePointer()) {
       inputRef.current?.focus();
     }
-  }, [animating]);
+  }, [animating, isCoarsePointer]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -352,38 +376,44 @@ export default function App() {
           );
         })}
 
-        {booted ? (
-          <form onSubmit={handleSubmit} className="input-line">
+        {!booted && <span className="cursor-blink" />}
+      </div>
+
+      {booted && (
+        <div className="terminal-controls">
+          <form onSubmit={handleSubmit} className="input-line terminal-inputbar">
             <Prompt />
             <input
               ref={inputRef}
               className="terminal-input"
               value={input}
               onChange={(event) => setInput(event.target.value)}
+              onFocus={scrollToBottom}
               onKeyDown={handleKeyDown}
-              autoFocus
               spellCheck={false}
               autoComplete="off"
               autoCapitalize="off"
               placeholder="type a command..."
-              disabled={animating}
+              readOnly={animating}
+              aria-disabled={animating}
             />
           </form>
-        ) : (
-          <span className="cursor-blink" />
-        )}
-      </div>
 
-      {booted && (
-        <div className="chips-bar">
-          {CHIP_COMMANDS.map((command) => (
-            <button key={command} className="chip" onClick={() => handleChipClick(command)}>
-              {command}
+          <div className="chips-bar">
+            {CHIP_COMMANDS.map((command) => (
+              <button
+                key={command}
+                type="button"
+                className="chip"
+                onClick={() => handleChipClick(command)}
+              >
+                {command}
+              </button>
+            ))}
+            <button type="button" className="chip chip-help" onClick={() => handleChipClick('help')}>
+              help
             </button>
-          ))}
-          <button className="chip chip-help" onClick={() => handleChipClick('help')}>
-            help
-          </button>
+          </div>
         </div>
       )}
     </div>

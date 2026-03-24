@@ -9,6 +9,8 @@
 }
 
 :root {
+  --app-height: 100dvh;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
   --bg: #0c0c0c;
   --bg-bar: #1a1a1a;
   --bg-tab: #141414;
@@ -91,6 +93,7 @@ body,
   font-size: 14px;
   line-height: 1.7;
   overflow: hidden;
+  -webkit-text-size-adjust: 100%;
   transition: background 0.3s ease, color 0.3s ease;
 }
 
@@ -126,8 +129,10 @@ body,
   position: relative;
   display: flex;
   flex-direction: column;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: var(--app-height);
+  min-height: 100dvh;
+  overflow: hidden;
   background: var(--bg);
 }
 
@@ -167,6 +172,9 @@ body,
   color: var(--text-muted);
   font-size: 12px;
   letter-spacing: 0.05em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .terminal-tabs {
@@ -207,8 +215,10 @@ body,
 .terminal-body {
   flex: 1;
   overflow-y: auto;
-  padding: 20px 24px 80px;
+  padding: 20px 24px 16px;
   scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   box-shadow: inset 0 0 120px var(--glow);
 }
 
@@ -303,8 +313,22 @@ body,
   white-space: pre;
 }
 
+.terminal-controls {
+  flex-shrink: 0;
+  background: var(--bg-bar);
+  border-top: 1px solid var(--border);
+  padding-bottom: calc(10px + var(--safe-bottom));
+}
+
+.terminal-inputbar {
+  padding: 12px 24px 8px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
 .terminal-input {
   flex: 1;
+  min-width: 0;
   border: 0;
   outline: 0;
   background: transparent;
@@ -340,20 +364,21 @@ body,
 }
 
 .chips-bar {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 50;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
-  padding: 10px 24px;
-  background: var(--bg-bar);
-  border-top: 1px solid var(--border);
+  padding: 10px 24px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.chips-bar::-webkit-scrollbar {
+  display: none;
 }
 
 .chip {
+  flex: 0 0 auto;
+  white-space: nowrap;
   padding: 6px 14px;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -362,6 +387,7 @@ body,
   font: inherit;
   font-size: 12px;
   cursor: pointer;
+  touch-action: manipulation;
   transition: all 0.15s ease;
 }
 
@@ -445,8 +471,17 @@ body,
     font-size: 13px;
   }
 
+  .terminal-topbar {
+    padding: 0 12px;
+  }
+
+  .tab {
+    padding: 0 14px;
+    font-size: 11px;
+  }
+
   .terminal-body {
-    padding: 12px 14px 90px;
+    padding: 12px 14px;
   }
 
   .stat-row {
@@ -462,11 +497,19 @@ body,
     min-width: unset;
   }
 
+  .terminal-inputbar {
+    padding: 10px 14px 8px;
+  }
+
   .chips-bar {
-    padding: 8px 14px;
+    padding: 8px 14px 0;
   }
 
   .chip-help {
     margin-left: 0;
+  }
+
+  .terminal-input {
+    font-size: 16px;
   }
 }
