@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { CHIP_COMMANDS, COMMANDS, THEMES, getWelcomeLines, runCommand } from './terminalData';
 
 function Prompt() {
@@ -416,6 +417,8 @@ export default function App() {
           </div>
         </div>
       )}
+
+      <Analytics />
     </div>
   );
 }
