@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="PR terminal icon">
+  <rect width="64" height="64" rx="14" fill="#111111" />
+  <path d="M16 20h32v24H16z" fill="none" stroke="#22c55e" stroke-width="3" />
+  <path d="m22 28 7 6-7 6" fill="none" stroke="#22c55e" stroke-linecap="round" stroke-linejoin="round" stroke-width="3" />
+  <path d="M34 40h8" fill="none" stroke="#60a5fa" stroke-linecap="round" stroke-width="3" />
+</svg>
